@@ -1,12 +1,13 @@
 from django.urls import path
 from . import views
 
+
 urlpatterns = [
     path("", views.home, name='home'),
     path("user_login/", views.user_login, name='user_login'),
     path("user_signup/", views.user_signup, name='user_signup'),
-    path("plantOperator_login/", views.plantOperator_login, name='plantOperator_login'),
-    path("plantOperator_signup/", views.plantOperator_signup, name='plantOperator_signup'),
+    path("technician_login/", views.technician_login, name='technician_login'),
+    path("technician_signup/", views.technician_signup, name='technician_signup'),
     path("admin_login/", views.admin_login, name='admin_login'),
     path("admin_signup/", views.admin_signup, name='admin_signup'),
     path("logout/", views.logout, name='logout'),
@@ -15,17 +16,17 @@ urlpatterns = [
     path("admin_dashboard/", views.admin_dashboard, name='admin_dashboard'),
     path("view_personnel/", views.admin_view_all_personnel, name='view_personnel'),
     path("user_dashboard/", views.user_dashboard, name='user_dashboard'),
-    path("plantOperator_dashboard/", views.plantOperator_dashboard, name='plantOperator_dashboard'),
-    path("attendance_plantOperator/", views.plantOperator_attendance, name='plantOperator_attendance'),
+    path("technician_dashboard/", views.technician_dashboard, name='technician_dashboard'),
+    path("attendance_technician/", views.technician_attendance, name='technician_attendance'),
     path("customer_request/", views.customer_request, name='customer_request'),
     path("customer_feedback/", views.leave_feedback, name='customer_feedback'),
     path("delete_request/<int:id>/", views.delete_request, name='delete_request'),
     path("update_request/<int:id>/", views.UpdateRequest.as_view(), name='update_request'),
     path("single_customer/<int:id>/", views.get_single_customer, name='single_customer'),
     path("delete_customer/<int:id>/", views.delete_customer, name='delete_customer'),
-    path("single_plantOperator/<int:id>/", views.get_single_plantOperator, name='single_plantOperator'),
-    path("delete_plantOperator/<int:id>/", views.delete_plantOperator, name='delete_plantOperator'),
-    path("admin/update_plantOperator/<int:id>/", views.UpdatePlantOperator.as_view(), name='admin_plantOperator_update'),
+    path("single_technician/<int:id>/", views.get_single_technician, name='single_technician'),
+    path("delete_technician/<int:id>/", views.delete_technician, name='delete_technician'),
+    path("admin/update_technician/<int:id>/", views.UpdateTechnician.as_view(), name='admin_technician_update'),
     path("feedback/", views.admin_feedback, name='admin_feedback'),
     path("feedback/<int:id>/", views.delete_feedback, name='delete_feedback'),
     path("attendance/", views.view_attendance, name='attendance'),
