@@ -54,7 +54,7 @@ class Admin(models.Model):
         verbose_name_plural = "Admin"
 
 
-class PlantOperator(models.Model):
+class Technician(models.Model):
     username = models.CharField(max_length=100)
     password = models.CharField(max_length=100)
     email = models.EmailField(max_length=200, unique=True)
@@ -79,19 +79,19 @@ class PlantOperator(models.Model):
 
     @property
     def get_person(self):
-        return reverse('delete_plant_operator', kwargs={"id": self.id})
+        return reverse('delete_technician', kwargs={"id": self.id})
 
     def get_absolute_url(self):
-        return reverse('single_plant_operator', kwargs={"id": self.id})
+        return reverse('single_technician', kwargs={"id": self.id})
 
     class Meta:
-        verbose_name_plural = "PlantOperator"
+        verbose_name_plural = "Technician"
 
     def save(self, *args, **kwargs):
         if not self.username:
             return
 
-        super(PlantOperator, self).save(*args, **kwargs)
+        super(Technician, self).save(*args, **kwargs)
         if self.image:
             size = 300, 300
             image = Image.open(self.image)
@@ -102,8 +102,16 @@ class PlantOperator(models.Model):
             fh.close()
 
 
-class Machinery(models.Model):
-    MACHINERY_TYPES = [
+
+class Request(models.Model):
+    REPAIR_TYPES = [
+        ('water supply repair', 'Water Supply Repair'),
+        ('sewage repair', 'Sewage Repair'),
+        ('emergency response', 'Emergency Response'),
+        ('infrastructure repair', 'Infrastructure Repair')
+    ]
+
+    CATEGORY_CHOICES = [
         ('Water Pump', 'Water Pump'),
         ('Sewage Pump', 'Sewage Pump'),
         ('Treatment Plant Equipment', 'Treatment Plant Equipment'),
@@ -111,46 +119,36 @@ class Machinery(models.Model):
         ('Jetting Machine', 'Jetting Machine'),
     ]
 
-    name = models.CharField(max_length=100)
-    type = models.CharField(max_length=100, choices=MACHINERY_TYPES)
-    description = models.TextField()
-    availability = models.BooleanField(default=True)
-    operator = models.ForeignKey(PlantOperator, on_delete=models.SET_NULL, null=True, blank=True)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name_plural = "Machinery"
-
-
-class Request(models.Model):
-    machinery = models.ForeignKey(Machinery, on_delete=models.CASCADE, null=True)
-    problem_description = models.CharField(max_length=1000, null=False)
-    date = models.DateField(auto_now=True)
-    cost = models.PositiveIntegerField(null=True)
-    customer = models.ForeignKey('Customer', on_delete=models.CASCADE, null=True)
-    plant_operator = models.ForeignKey('PlantOperator', on_delete=models.CASCADE, null=True)
-
-    final = [
+    STATUS_CHOICES = [
         ('Pending', 'Pending'),
         ('Approved', 'Approved'),
         ('Repairing', 'Repairing'),
         ('Repairing Done', 'Repairing Done'),
         ('Released', 'Released')
     ]
-    status = models.CharField(max_length=100, choices=final, default='Pending', null=True)
+
+    category = models.CharField(max_length=100, choices=REPAIR_TYPES)
+    machinery_type = models.CharField(max_length=100, choices=CATEGORY_CHOICES)
+    machinery_name = models.CharField(max_length=100, null=False)
+    machinery_model = models.CharField(max_length=100, null=False)
+    machinery_brand = models.CharField(max_length=100, null=False)
+    problem_description = models.CharField(max_length=1000, null=False)
+    date = models.DateField(auto_now=True)
+    cost = models.PositiveIntegerField(null=True)
+    customer = models.ForeignKey('Customer', on_delete=models.CASCADE, null=True)
+    technician = models.ForeignKey('Technician', on_delete=models.CASCADE, null=True)
+    status = models.CharField(max_length=100, choices=STATUS_CHOICES, default='Pending', null=True)
 
     def __str__(self):
-        return f"{self.machinery} - {self.problem_description}"
+        return f"{self.machinery_type} - {self.machinery_name} - {self.machinery_brand}"
 
     class Meta:
         ordering = ('-date',)
-        verbose_name_plural = "Request"
+        verbose_name_plural = "Requests"
 
 
 class Attendance(models.Model):
-    plant_operator = models.ForeignKey('PlantOperator', on_delete=models.CASCADE, null=True)
+    technician = models.ForeignKey('Technician', on_delete=models.CASCADE, null=True)
     date = models.DateTimeField(default=timezone.now, blank=True)
     status = [
         ('Yes', 'Yes'),
@@ -159,7 +157,7 @@ class Attendance(models.Model):
     present_status = models.CharField(max_length=20, choices=status, default='No')
 
     def __str__(self):
-        return f"{self.plant_operator} - {self.present_status}"
+        return f"{self.technician} - {self.present_status}"
 
     class Meta:
         verbose_name_plural = "Attendance"
